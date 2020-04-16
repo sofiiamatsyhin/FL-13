@@ -57,10 +57,11 @@
   left: 50%;
   transform: translate(-50%, -50%);
 }
-.main .main-content .main-btn {
+.main .main-content .main-link {
   position: absolute;
   color: #777;
   font-size: 12px;
+  text-decoration: none;
   text-transform: uppercase;
   font-weight: bold;
   padding: 15px 20px;
@@ -138,6 +139,7 @@
 }
 .container .section-post-wrap .article .more {
   color: #777;
+  text-decoration: none;
   font-size: 13px;
   font-weight: bold;
   padding: 15px 20px;
