@@ -21,7 +21,7 @@ if (message) {
             guess = parseInt(prompt(`Choose a roulette pocket number from 0 to ${maxNum}
 Attempts left: ${attempt}
 Total prize: ${money}$
-Possible prize on current attempt: ${prize}$`))
+Possible prize on current attempt: ${prize}$`));
             if (guess === null) {
                 alert(`Thank you for your participation. Your prize is: ${money}$`);
                 message = confirm('Do you want to play again?');
