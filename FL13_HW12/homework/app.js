@@ -1,6 +1,6 @@
 const root = document.getElementById('root');
 
-let dataBook = JSON.parse(localStorage.getItem('data'))
+JSON.parse(localStorage.getItem('BookList'));
 
 function Page() {
 

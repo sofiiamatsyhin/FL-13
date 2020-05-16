@@ -1,4 +1,4 @@
-const data = [
+const books = [
     {
         id: '1',
         bookName: 'Nineteen Eighty-Four',
@@ -26,3 +26,5 @@ const data = [
         and his experiences with state authorities intent on reforming him.`
     }
 ]
+
+localStorage.setItem('Books', JSON.stringify(books))
