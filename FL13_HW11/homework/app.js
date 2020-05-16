@@ -51,96 +51,201 @@ const data = [
 ];
 
 const rootNode = document.getElementById('root');
+const ENTER_KEY_CODE = 13;
+let menuBox = null;
+let isMenuDisplayed = false;
+let isRenameMode = false;
+let menuActionTarget = null;
+let inputField = null;
+const CONTEXT_MENU_ITEMS = [{
+  text: 'Rename',
+  action: renameItem
+}, {
+  text: 'Delete item',
+  action: deleteItem
+}];
 
-function folders(data, out) {
-  const list = document.createElement('ul');
-  list.setAttribute('class', 'hide');
-  data.forEach(function (item) {
-    const listItems = document.createElement('li');
-    if (item.folder) {
-      listItems.innerHTML = `<p><i class='material-icons'>folder</i>${item['title']}</p>`;
-      listItems.firstChild.setAttribute('class', 'folder');
-      if (!item.children) {
-        const list = document.createElement('ul');
-        list.setAttribute('class', 'hide empty-list');
-        list.innerHTML = `<li><p class='empty'>Folder is empty</p></li>`;
-        listItems.appendChild(list);
-      }
-    } else if (item.title && !item.folder) {
-      listItems.innerHTML = `<p><i class='material-icons'>insert_drive_file</i>${item['title']}</p>`;
-      listItems.firstChild.setAttribute('class', 'file');
-    }
-    if (item.folder) {
-      if (item.children) {
-        folders(item.children, listItems);
-      }
-    }
-    if (list.parentElement) {
-      if (list.parentElement.getAttribute('id')) {
-        list.classList.remove('hide');
-      }
-    }
-    list.appendChild(listItems);
-    out.appendChild(list);
-  });
+function deleteItem() {
+  let nodeToDelete = menuActionTarget.parentNode;
+  let parentToCheck = nodeToDelete.parentNode;
+
+  nodeToDelete.remove();
+
+  if (!parentToCheck.hasChildNodes()) {
+    createEmptyItem(parentToCheck);
+  }
+
+  menuActionTarget = null;
+  contextMenuHide();
 }
 
-folders(data, rootNode);
+function renameItem() {
+  isRenameMode = true;
+  contextMenuHide();
+  menuActionTarget.setAttribute('contenteditable', 'true');
+  menuActionTarget.focus();
 
-let paragraphs = document.querySelectorAll('p.folder').forEach(function (item) {
-  item.onclick = showOrHide;
-  item.firstChild.onclick = showOrHide;
-});
+  let end = 0;
 
-function showOrHide(e) {
-  e.stopPropagation();
-  if (e.target.classList.contains('folder')) {
-    if (e.target.firstChild.textContent === 'folder') {
-      e.target.firstChild.textContent = 'folder_open';
-    } else {
-      e.target.firstChild.textContent = 'folder';
-    }
-    e.target.nextElementSibling.classList.toggle('hide');
+  const selection = window.getSelection();
+  const range = document.createRange();
+  const textToEdit = menuActionTarget.firstChild;
+
+  if (textToEdit.nodeValue.indexOf('.') > 0) {
+    end = textToEdit.nodeValue.indexOf('.');
   } else {
-    if (e.target.textContent === 'folder') {
-      e.target.textContent = 'folder_open';
-    } else {
-      e.target.textContent = 'folder';
+    end = textToEdit.nodeValue.length;
+  }
+
+  range.setStart(textToEdit, 0);
+  range.setEnd(textToEdit, end);
+  selection.removeAllRanges();
+  selection.addRange(range)
+
+  menuActionTarget.addEventListener('keydown', (event) => {
+    if (event.keyCode === ENTER_KEY_CODE) {
+      disableRenameMode(event, menuActionTarget);
     }
-    e.target.parentNode.nextElementSibling.classList.toggle('hide');
+  })
+}
+
+function createListElement(root) {
+  let listElement = document.createElement('ul');
+  root.appendChild(listElement);
+  return listElement;
+}
+
+function createListItem(root, title, isFolder) {
+  let listItem = document.createElement('li');
+  let spanItem = document.createElement('span');
+  spanItem.innerText += title;
+  listItem.appendChild(spanItem);
+
+  if (isFolder) {
+    spanItem.classList.add('folder');
+    spanItem.classList.add('collapsed');
+    spanItem.addEventListener('click', (event) => folderStateToggle(event));
+  } else {
+    spanItem.classList.add('file');
+  }
+
+  spanItem.addEventListener('click', (event) => removeStaticHighlihght(event, menuActionTarget));
+  spanItem.addEventListener('contextmenu', (event) => removeStaticHighlihght(event, menuActionTarget));
+  spanItem.addEventListener('blur', disableRenameMode);
+  spanItem.addEventListener('contextmenu', contextMenuShow);
+  addHoverEffect(spanItem);
+  root.appendChild(listItem);
+  return listItem;
+}
+
+function createEmptyItem(root) {
+  let emptyList = createListElement(root);
+  emptyList.classList.add('empty');
+  let emptyItem = document.createElement('li');
+  emptyItem.innerText += 'Folder is empty';
+  emptyList.appendChild(emptyItem);
+}
+
+function addHoverEffect(item) {
+  item.addEventListener('mouseenter', (event) => {
+    if (!isMenuDisplayed && !isRenameMode) {
+      event.target.classList.add('highlighted');
+      event.stopPropagation();
+    }
+  })
+
+  item.addEventListener('mouseout', (event) => {
+    if (!isMenuDisplayed && !isRenameMode) {
+      event.target.classList.remove('highlighted');
+      event.stopPropagation();
+    }
+  })
+}
+
+function folderStateToggle(event) {
+  if (event.target.matches('span.folder')) {
+    event.target.classList.toggle('collapsed');
   }
 }
 
-function rightClick() {
-const menuArea = document.querySelector('#root');
-const rightCl = document.createElement('ul');
-rightCl.className = 'rightMenu hide';
-rightCl.innerHTML = `<li class='rename'>Rename</li><li class='deleteItem'>Delete</li>`;
-document.querySelector('#root').appendChild(rightCl);
-menuArea.addEventListener( 'contextmenu', event => {
-  event.preventDefault();
-  rightCl.style.top = `${event.clientY}px`;
-  rightCl.style.left = `${event.clientX}px`;
-  rightCl.classList.add('active');
-}, false);
-  document.addEventListener('click', event => {
-  let rightBottom = 2;
-  if (event.button !== rightBottom) {
-    rightCl.classList.remove('active');
+function removeStaticHighlihght(event, previousActionTarget) {
+  if (previousActionTarget && previousActionTarget.classList.contains('highlighted')) {
+    previousActionTarget.classList.remove('highlighted');
   }
-}, false);
-rightCl.addEventListener('click', event => {
-  event.stopPropagation();
-}, false);
+  event.target.classList.add('highlighted');
 }
-rightClick();
-document.addEventListener('contextmenu', rightClick);
-const del = document.querySelector('.deleteItem');
-del.addEventListener('click', function showOrHide(e) {
-  e.stopPropagation();
-  if (e.target.classList.contains('folder')) {
-    e.target.nextElementSibling.classList.toggle('hide');
-    } else {
-    e.target.parentNode.nextElementSibling.classList.toggle('hide');
+
+function createContextMenu(items) {
+  const body = document.querySelector('body');
+  let contextMenu = document.createElement('div');
+  contextMenu.className = 'menu';
+  for (let item of items) {
+    let menuItem = document.createElement('div');
+    menuItem.innerText += item.text;
+    menuItem.className = 'menu-item';
+    menuItem.addEventListener('click', item.action)
+    contextMenu.appendChild(menuItem);
   }
-});
+  body.appendChild(contextMenu);
+}
+
+function contextMenuShow(event) {
+  const PADDING = 5;
+  let left = event.clientX;
+  let top = event.clientY;
+  menuBox = document.querySelector('.menu');
+  menuBox.style.left = left + PADDING + 'px';
+  menuBox.style.top = top - PADDING + 'px';
+  menuBox.style.display = 'block';
+  event.target.focus();
+  event.preventDefault();
+  isMenuDisplayed = true;
+  menuActionTarget = event.target;
+
+  if (!menuActionTarget.matches('span.folder') && !menuActionTarget.matches('span.file')) {
+    menuBox.style.pointerEvents = 'none';
+  } else {
+    menuBox.style.pointerEvents = 'auto';
+  }
+}
+
+function contextMenuHide() {
+  if (isMenuDisplayed) {
+    menuBox.style.display = 'none';
+    isMenuDisplayed = false;
+    if (menuActionTarget && !isRenameMode){
+      menuActionTarget.classList.remove('highlighted');
+    }
+  }
+}
+
+function disableRenameMode(event) {
+  if (isRenameMode && !event.target.matches('div.menu-item')) {
+    isRenameMode = false;
+    menuActionTarget.removeAttribute('contenteditable');
+    menuActionTarget.classList.remove('highlighted');
+  }
+}
+
+function buildHTMLTree(tree, root) {
+  let list = createListElement(root);
+  for (let node of tree) {
+    let isEmptyFolder = node.folder && !node.children;
+    let item = createListItem(list, node.title, node.folder);
+
+    if (node.children) {
+      buildHTMLTree(node.children, item);
+    } else {
+      if (isEmptyFolder) {
+        createEmptyItem(item);
+      }
+    }
+  }
+}
+
+createContextMenu(CONTEXT_MENU_ITEMS);
+buildHTMLTree(data, rootNode);
+
+window.addEventListener('click', contextMenuHide);
+window.addEventListener('click', disableRenameMode);
+rootNode.addEventListener('contextmenu', contextMenuShow);
