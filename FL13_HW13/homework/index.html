@@ -8,13 +8,13 @@
     <title>Document</title>
 </head>
 <body>
-    <header class="header container d-flex justify-content-between align-items-center">
-        <a class="header__brand navbar-brand text-dark font-weight-bold" href="#">Games</a>
-        <nav class="header__nav nav navbar navbar-expand-lg navbar-light">
+    <header class="header container">
+        <nav class="header__nav nav navbar navbar-expand-lg navbar-light d-flex justify-content-between">
+            <a class="header__brand navbar-brand text-dark font-weight-bold" href="#">Games</a>
             <button class="nav__btn btn navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="btn__inner navbar-toggler-icon"></span>
             </button>
-            <div class="nav__list list collapse navbar-collapse" id="navbarTogglerDemo01">
+            <div class="nav__list list collapse navbar-collapse col-lg-4" id="navbarTogglerDemo01">
                 <ul class="navbar-nav">
                     <li class="list__item nav-item"><a class="list__link nav-link text-dark" href="#">Home</a></li>
                     <li class="list__item nav-item"><a class="list__link nav-link text-dark" href="#">Features</a></li>
@@ -22,13 +22,13 @@
                     <li class="list__item_disabled nav-item"><a class="list__link_disabled nav-link disabled" href="#">Disabled</a></li>
                 </ul>
             </div>
+            <button type="button" class="header__btn btn btn-dark rounded-0 d-none d-lg-block">Push to Start</button>
         </nav>
-        <button type="button" class="header__btn btn btn-dark rounded-0 d-none d-lg-block">Push to Start</button>
     </header>
     <section class="main container">
         <div class="d-flex flex-column-reverse flex-lg-row">
             <div class="py-5 col-12 col-lg-4">
-                <h1 class="main__header col-md-7 pl-0 ml-0">Front-end Lab CSS-Frameworks</h1>
+                <h1 class="main__header col-md-7 col-lg-12 pl-0 ml-0">Front-end Lab CSS-Frameworks</h1>
                 <p class="main__text pt-3 text-dark">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatubis et magnis dis parturient montes, nascetur rificulus mus.</p>
                 <button class="main__btn btn text-white">Find Out More</button>
             </div>
