@@ -22,11 +22,12 @@ $($add).click(function(e) {
   e.preventDefault();
   const $li = $('<li class="item"></li>');
   const $span = $('<span class="text"></span>').text($($input).val());
-  const $btnRemove = $('<button class="remove"></button> ').text('Remove');
+  const $btnRemove = $('<button class="item-remove"></button> ').text('Remove');
   const $btnComplete = $('<button class="complete"></button>').text('Complete');
+
   $($btnRemove).click(removeTask);
   $($btnComplete).click(completeTask);
-  $($li).append($span, $btnRemove);
+  $($li).append($span, $btnRemove, $btnComplete);
   $($list).prepend($li);
   $($input).val('');
 });
