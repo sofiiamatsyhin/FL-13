@@ -38,10 +38,7 @@ function removeTask() {
 function completeTask() {
   $($(this).parent()[0].firstElementChild).toggleClass('done');
 }
-// $('.item-search').click(function() {
-//   const $input = $('.search').val();
-//   $('.search').text(`${$(`.item-text:contains(${$inputText})`).length}`);
-// });
+
 $('.item-search').click(function () {
   const $inputText = $('.search').val();
   if ($inputText === '') {
